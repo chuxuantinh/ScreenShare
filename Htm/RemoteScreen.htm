@@ -1,0 +1,113 @@
+<html>
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+<script language="javascript" type="text/javascript" >
+
+    var ENTER = 13;
+    var SPACE = 32;
+    var count = 0;  
+    var elemTextBox;
+    var x;
+    var y;
+    var isFull = false;
+    var browsers = ["msie", "chrome", "firefox", "iphone", "android"];
+    var id = "";
+
+    function OnMouseMove() 
+    {
+        x = event.offsetX;
+        y = event.offsetY;
+    }
+
+    function OnClick() 
+    {
+        x = event.offsetX;
+        y = event.offsetY;
+        GetNewImage("");
+    }
+
+    function OnKeyPress() 
+    {
+        if (event.keyCode == SPACE) 
+        {
+            // Switch size of picture
+            isFull = !isFull
+            GetNewImage("");
+        }
+        else 
+        {
+            // Input text
+            elemTextBox = null;
+            elemTextBox = document.createElement("input");
+            elemTextBox.type = "text";
+            elemTextBox.style.position = "absolute";
+            elemTextBox.style.left = x;
+            elemTextBox.style.top = y;
+            elemTextBox.style.backgroundColor = "yellow";
+            document.body.appendChild(elemTextBox);
+            elemTextBox.focus();
+
+            elemTextBox.onkeypress =
+                function () 
+                {
+                    if (event.keyCode == ENTER) 
+                    {
+                        var text = elemTextBox.value;
+                        document.body.removeChild(elemTextBox);
+                        elemTextBox = null;
+                        GetNewImage(text);
+                    }
+                };
+        }
+    }
+
+    function GetNewImage(text) 
+    {
+        IdentifyBrowser();
+        var sFull = isFull ? "1": "0";
+        var sText = text.length > 0 ? "&Text=" + text : "";
+        var elemScreen = document.getElementById("Screen");
+        elemScreen.src = "RemoteScreen" + id + "&Full=" + sFull + "&X=" + x + "&Y=" + y + sText + "&_count=" + count++;
+        elemScreen.focus();
+    }
+
+    function IdentifyBrowser() 
+    {
+        if (id.length == 0) 
+        {
+            var sessionId = Math.random().toString();
+
+            var agent = navigator.userAgent.toLowerCase();
+            var more = true;
+            var browser = "";
+            for (var i = 0; i < browsers.length; i++) 
+            {
+                if (agent.indexOf(browsers[i]) != -1) 
+                {
+                    browser = browsers[i];
+                    break;
+                }
+            }
+
+            id = "?Browser=" + browser + "&SessionId=" + sessionId;
+        }
+    }
+
+    function OnLoadBody() 
+    {
+        IdentifyBrowser();
+        var elemScreen = document.getElementById("Screen");
+        elemScreen.src = "Picture" + id;
+        elemScreen.focus();
+    }
+
+</script>
+ 
+</head>
+<body onload="OnLoadBody()"> 
+    <input type="image" id="Screen" style="cursor:hand" onclick="OnClick()" onmousemove="OnMouseMove()" onkeypress="OnKeyPress()" />
+</body>
+
+</html>
